@@ -1,6 +1,6 @@
 class Api::V1::OrdersController < ApplicationController
   before_action :load_store
-  before_action :find_store_order
+  before_action :find_store_order, only: %i[update edit destroy update]
   before_action :find_items, only: %i[assing_items_to_order]
 
   def create
