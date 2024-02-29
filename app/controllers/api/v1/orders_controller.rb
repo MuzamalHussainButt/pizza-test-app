@@ -1,7 +1,8 @@
 class Api::V1::OrdersController < ApplicationController
-  before_action :load_store, only: %i[create index calculate_bill]
-  before_action :find_store_order, only: %i[show update edit calculate_bill]
-  
+  before_action :load_store
+  before_action :find_store_order
+  before_action :find_items, only: %i[assing_items_to_order]
+
   def create
     @order = @store.orders.create!(store_params)
   end
@@ -24,6 +25,14 @@ class Api::V1::OrdersController < ApplicationController
     CalculateOrderBill.call(order_id: @order.id)
   end
 
+  def assing_items_to_order
+    @order.items = @items
+  end
+
+  def destroy
+    @order.destroy
+  end
+
   private
 
     def order_params
@@ -37,5 +46,9 @@ class Api::V1::OrdersController < ApplicationController
 
     def find_store_order
       @store.orders.find(params[:id])
+    end
+
+    def find_items
+      @items = Item.where(id: params[:item_ids].joins(",").map(&:to_i))
     end
 end
